@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soalan Peperiksaan Sejarah Alam Melayu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            font-size: 0.75rem; /* Further reduced base font size */
+        }
+        h1 {
+            font-size: 1.5rem; /* Further reduced h1 font size */
+        }
+        h2 {
+            font-size: 1.2rem; /* Further reduced h2 font size */
+        }
+        .tab-button {
+            font-size: 0.8rem; /* Further reduced tab button font size */
+            padding: 0.5rem 0.75rem; /* Adjusted padding */
+            transition: background-color 0.2s, color 0.2s; /* Smooth transition for color changes */
+        }
+        /* Specific colors for each tab */
+        .tab-button[onclick*="bahagianA"] {
+            background-color: #e0f7fa; /* Light Cyan */
+            color: #00796b;
+        }
+        .tab-button[onclick*="bahagianB"] {
+            background-color: #fff3e0; /* Light Orange */
+            color: #e65100;
+        }
+        .tab-button[onclick*="bahagianC"] {
+            background-color: #fce4ec; /* Light Pink */
+            color: #ad1457;
+        }
+
+        .tab-button.active {
+            background-color: #1a73e8; /* Blue for active tab */
+            color: white;
+            border-bottom: 2px solid #1a73e8;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .question-card {
+            background-color: white;
+            padding: 0.8rem; /* Further reduced padding */
+            border-radius: 0.5rem; /* Slightly smaller border-radius */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Lighter shadow */
+            margin-bottom: 0.8rem; /* Further reduced margin */
+        }
+        .answer-display {
+            background-color: #e0f2fe;
+            border-left: 4px solid #2196f3;
+            padding: 0.6rem; /* Further reduced padding */
+            border-radius: 0.4rem;
+            margin-top: 1rem; /* Further reduced margin */
+        }
+        .correct-answer {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect-answer {
+            color: red;
+            font-weight: bold;
+        }
+        .table-input {
+            width: 100%;
+            padding: 0.3rem; /* Further reduced padding */
+            border: 1px solid #ccc;
+            border-radius: 0.25rem; /* Smaller border-radius */
+            font-size: 0.75rem; /* Reduced input font size */
+        }
+        /* Custom modal for alerts */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 15px; /* Reduced modal padding */
+            border: 1px solid #888;
+            width: 90%; /* Increased width for smaller screens */
+            max-width: 400px; /* Reduced max-width */
+            border-radius: 0.6rem;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 24px; /* Reduced close button font size */
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Specific adjustments for text-lg class used in questions */
+        .text-lg {
+            font-size: 0.85rem; /* Adjusted for question text */
+        }
+        .text-sm {
+            font-size: 0.7rem; /* Adjusted for smaller text like markah */
+        }
+        /* Button adjustments */
+        .submit-button {
+            padding: 0.6rem 1.5rem; /* Adjusted button padding */
+            font-size: 0.85rem; /* Adjusted button font size */
+        }
+        /* SVG Map Styling */
+        .map-container {
+            width: 100%;
+            max-width: 400px; /* Limit map width */
+            margin: 1rem auto;
+            border: 1px solid #ccc;
+            border-radius: 0.5rem;
+            background-color: #e0f7fa; /* Light blue background for map */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .map-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            fill: #333;
+        }
+        .map-sea {
+            fill: #a7d9f7; /* Light blue for sea */
+        }
+        .map-land {
+            fill: #c8e6c9; /* Light green for land */
+        }
+        .map-dot {
+            fill: #d32f2f; /* Red for kingdom markers */
+            r: 3; /* Radius of the dots */
+        }
+    </style>
+</head>
+<body class="p-2 sm:p-4">
+    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <h1 class="font-bold text-center mb-4 text-gray-800">Soalan Peperiksaan Sejarah Alam Melayu</h1>
+
+        <!-- Tab Buttons -->
+        <div class="flex flex-wrap justify-center mb-4 border-b border-gray-200">
+            <button id="tabA_button" class="tab-button active font-semibold rounded-t-md transition-colors duration-200" onclick="openTab(event, 'bahagianA')">Bahagian A</button>
+            <button id="tabB_button" class="tab-button font-semibold rounded-t-md transition-colors duration-200" onclick="openTab(event, 'bahagianB')">Bahagian B</button>
+            <button id="tabC_button" class="tab-button font-semibold rounded-t-md transition-colors duration-200" onclick="openTab(event, 'bahagianC')">Bahagian C</button>
+        </div>
+
+        <!-- Tab Content - Bahagian A -->
+        <div id="bahagianA" class="tab-content active">
+            <h2 class="font-bold mb-3 text-gray-700">Bahagian A: Soalan Objektif (Pilih jawapan yang paling tepat)</h2>
+
+            <!-- Question 1 -->
+            <div class="question-card" id="q1">
+                <p class="mb-2 text-lg">1. Apakah faktor utama kemunculan kerajaan agraria?</p>
+                <div class="space-y-1">
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q1" value="A" class="mr-1"> A. Kedudukan di pesisir pantai
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q1" value="B" class="mr-1"> B. Kegiatan perdagangan antarabangsa
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q1" value="C" class="mr-1"> C. Kesuburan tanah dan bekalan air
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q1" value="D" class="mr-1"> D. Penemuan sumber emas dan bijih timah
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-card" id="q2">
+                <p class="mb-2 text-lg">2. Antara berikut, yang manakah merupakan contoh kerajaan maritim di Alam Melayu?</p>
+                <div class="space-y-1">
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q2" value="A" class="mr-1"> A. Funan
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q2" value="B" class="mr-1"> B. Angkor
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q2" value="C" class="mr-1"> C. Majapahit
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q2" value="D" class="mr-1"> D. Sriwijaya
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-card" id="q3">
+                <p class="mb-2 text-lg">3. Apakah peranan utama pelabuhan entrepot pada zaman kerajaan awal di Alam Melayu?</p>
+                <div class="space-y-1">
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q3" value="A" class="mr-1"> A. Pusat pengeluaran hasil pertanian
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q3" value="B" class="mr-1"> B. Tempat persinggahan kapal dagang dan pertukaran barang
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q3" value="C" class="mr-1"> C. Kawasan tumpuan kegiatan keagamaan
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q3" value="D" class="mr-1"> D. Pusat pemerintahan dan pentadbiran
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-card" id="q4">
+                <p class="mb-2 text-lg">4. Mengapakah Kedah Tua menjadi sebuah pusat perdagangan yang penting pada suatu ketika dahulu?</p>
+                <div class="space-y-1">
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q4" value="A" class="mr-1"> A. Mempunyai angkatan tentera laut yang kuat
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q4" value="B" class="mr-1"> B. Kaya dengan hasil bumi seperti emas
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q4" value="C" class="mr-1"> C. Kedudukannya strategik di Selat Melaka
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q4" value="D" class="mr-1"> D. Menguasai laluan darat ke China
+                    </label>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-card" id="q5">
+                <p class="mb-2 text-lg">5. Apakah sumbangan Raja Gangga Negara yang terkenal dalam bidang pentadbiran?</p>
+                <div class="space-y-1">
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q5" value="A" class="mr-1"> A. Memperkenalkan sistem perundangan yang ketat
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q5" value="B" class="mr-1"> B. Menjadikan kerajaan sebagai pusat pendidikan
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q5" value="C" class="mr-1"> C. Meluaskan empayar melalui penaklukan
+                    </label>
+                    <label class="block cursor-pointer hover:bg-blue-50 p-1 rounded-sm transition-colors duration-150">
+                        <input type="radio" name="q5" value="D" class="mr-1"> D. Membina sistem pengairan yang maju
+                    </label>
+                </div>
+            </div>
+
+            <!-- Continue Button for Bahagian A -->
+            <div class="text-center mt-6">
+                <button onclick="continueToNextTab('bahagianA')" class="submit-button bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-md transition-transform transform hover:scale-105 duration-300">
+                    Teruskan
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content - Bahagian B -->
+        <div id="bahagianB" class="tab-content">
+            <h2 class="font-bold mb-3 text-gray-700">Bahagian B: Soalan Struktur (Jawab semua soalan)</h2>
+
+            <!-- SVG Map -->
+            <div class="map-container">
+                <p class="text-center text-lg font-semibold mb-2">Peta 1: Kerajaan Awal di Alam Melayu</p>
+                <svg viewBox="0 0 300 200" class="w-full h-auto">
+                    <!-- Sea -->
+                    <rect x="0" y="0" width="300" height="200" class="map-sea"></rect>
+
+                    <!-- Landmasses (Simplified) -->
+                    <!-- Malay Peninsula -->
+                    <polygon points="100,100 110,120 120,130 115,150 105,160 95,155 90,140 95,110" class="map-land"></polygon>
+                    <!-- Sumatra -->
+                    <polygon points="70,130 80,160 90,170 70,180 60,175 55,150 60,140" class="map-land"></polygon>
+                    <!-- Borneo (part) -->
+                    <polygon points="180,100 220,110 230,140 200,150 170,130" class="map-land"></polygon>
+                    <!-- Java -->
+                    <polygon points="140,170 170,180 180,190 150,195 130,185" class="map-land"></polygon>
+                    <!-- Mainland Southeast Asia (part) -->
+                    <polygon points="120,20 180,10 200,50 190,80 140,90 110,70" class="map-land"></polygon>
+
+                    <!-- Kingdom Markers and Labels -->
+                    <!-- Funan (Cambodia/Mekong Delta) -->
+                    <circle cx="150" cy="60" class="map-dot"></circle>
+                    <text x="155" y="65" class="map-label">Funan</text>
+
+                    <!-- Champa (Central Vietnam) -->
+                    <circle cx="180" cy="40" class="map-dot"></circle>
+                    <text x="185" y="45" class="map-label">Champa</text>
+
+                    <!-- Angkor (Cambodia) -->
+                    <circle cx="160" cy="75" class="map-dot"></circle>
+                    <text x="165" y="80" class="map-label">Angkor</text>
+
+                    <!-- Sriwijaya (Sumatra) -->
+                    <circle cx="75" cy="150" class="map-dot"></circle>
+                    <text x="80" y="155" class="map-label">Sriwijaya</text>
+
+                    <!-- Majapahit (Java) -->
+                    <circle cx="155" cy="180" class="map-dot"></circle>
+                    <text x="160" y="185" class="map-label">Majapahit</text>
+                </svg>
+            </div>
+
+            <!-- Question 1 (B) -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">1. Peta 1 menunjukkan lokasi beberapa kerajaan awal di Alam Melayu.</p>
+                <p class="mb-1 text-lg">(a) Berdasarkan Peta 1, namakan dua buah kerajaan agraria.</p>
+                <ol class="list-decimal list-inside ml-2 space-y-1">
+                    <li><input type="text" id="b1a_i" class="table-input" placeholder="Jawapan i"></li>
+                    <li><input type="text" id="b1a_ii" class="table-input" placeholder="Jawapan ii"></li>
+                </ol>
+                <p class="text-sm text-gray-500 mt-1">[2 markah]</p>
+
+                <p class="mt-3 mb-1 text-lg">(b) Berikan dua ciri umum kerajaan agraria.</p>
+                <ol class="list-decimal list-inside ml-2 space-y-1">
+                    <li><input type="text" id="b1b_i" class="table-input" placeholder="Ciri i"></li>
+                    <li><input type="text" id="b1b_ii" class="table-input" placeholder="Ciri ii"></li>
+                </ol>
+                <p class="text-sm text-gray-500 mt-1">[2 markah]</p>
+
+                <p class="mt-3 mb-1 text-lg">(c) Nyatakan satu kepentingan sistem pengairan kepada kerajaan agraria.</p>
+                <input type="text" id="b1c" class="table-input" placeholder="Kepentingan">
+                <p class="text-sm text-gray-500 mt-1">[1 markah]</p>
+            </div>
+
+            <!-- Question 2 (B) - Table -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">2. Lengkapkan jadual di bawah berkaitan dengan tokoh-tokoh penting dalam kerajaan awal Alam Melayu.</p>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white border border-gray-200 rounded-md shadow-sm">
+                        <thead>
+                            <tr class="bg-blue-100 text-blue-800">
+                                <th class="py-1 px-2 border-b text-left">Tokoh</th>
+                                <th class="py-1 px-2 border-b text-left">Kerajaan</th>
+                                <th class="py-1 px-2 border-b text-left">Sumbangan Utama</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="py-1 px-2 border-b">Patih Gajah Mada</td>
+                                <td class="py-1 px-2 border-b"><input type="text" id="b2_patih_kerajaan" class="table-input" placeholder="Kerajaan"></td>
+                                <td class="py-1 px-2 border-b">Memperluas empayar melalui Sumpah Palapa</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-2 border-b"><input type="text" id="b2_angkor_tokoh" class="table-input" placeholder="Tokoh"></td>
+                                <td class="py-1 px-2 border-b">Angkor</td>
+                                <td class="py-1 px-2 border-b">Membina Angkor Wat</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1 px-2 border-b">Parameswara</td>
+                                <td class="py-1 px-2 border-b"><input type="text" id="b2_parameswara_kerajaan" class="table-input" placeholder="Kerajaan"></td>
+                                <td class="py-1 px-2 border-b">Mengasaskan Kesultanan Melayu Melaka</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-sm text-gray-500 mt-1">[3 markah]</p>
+            </div>
+
+            <!-- Question 3 (B) -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">3. Apakah yang dimaksudkan dengan pelabuhan entrepot?</p>
+                <input type="text" id="b3" class="table-input" placeholder="Definisi pelabuhan entrepot">
+                <p class="text-sm text-gray-500 mt-1">[2 markah]</p>
+            </div>
+
+            <!-- Question 4 (B) -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">4. Nyatakan dua faktor kemunculan pelabuhan entrepot di Alam Melayu.</p>
+                <ol class="list-decimal list-inside ml-2 space-y-1">
+                    <li><input type="text" id="b4_i" class="table-input" placeholder="Faktor i"></li>
+                    <li><input type="text" id="b4_ii" class="table-input" placeholder="Faktor ii"></li>
+                </ol>
+                <p class="text-sm text-gray-500 mt-1">[2 markah]</p>
+            </div>
+
+            <!-- Continue Button for Bahagian B -->
+            <div class="text-center mt-6">
+                <button onclick="continueToNextTab('bahagianB')" class="submit-button bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full shadow-md transition-transform transform hover:scale-105 duration-300">
+                    Teruskan
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content - Bahagian C -->
+        <div id="bahagianC" class="tab-content">
+            <h2 class="font-bold mb-3 text-gray-700">Bahagian C: Soalan Esei (Pilih satu soalan sahaja)</h2>
+
+            <!-- Essay Question 1 -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">1. Huraikan faktor-faktor yang membawa kepada kemunculan dan kegemilangan kerajaan maritim di Alam Melayu.</p>
+                <p class="text-sm text-gray-500 mt-1">[10 markah]</p>
+                <!-- No input field for essay, as it's for display/discussion -->
+            </div>
+
+            <!-- Essay Question 2 -->
+            <div class="question-card">
+                <p class="mb-2 text-lg">2. Bincangkan kepentingan warisan kerajaan awal Alam Melayu kepada pembentukan negara bangsa Malaysia hari ini.</p>
+                <p class="text-sm text-gray-500 mt-1">[10 markah]</p>
+                <!-- No input field for essay, as it's for display/discussion -->
+            </div>
+
+            <!-- Submit Button for Bahagian C -->
+            <div class="text-center mt-6">
+                <button onclick="submitAnswers()" class="submit-button bg-green-600 hover:bg-green-700 text-white font-bold rounded-full shadow-md transition-transform transform hover:scale-105 duration-300">
+                    Hantar Jawapan
+                </button>
+            </div>
+        </div>
+
+        <!-- Answer Display Area -->
+        <div id="answers" class="answer-display mt-6 hidden">
+            <h2 class="font-bold mb-3 text-blue-800">Jawapan Anda dan Jawapan Sebenar</h2>
+            <div id="answerContent" class="space-y-3 text-gray-700">
+                <!-- Answers will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Modal for alerts -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessage" class="text-lg"></p>
+            <button onclick="closeModal()" class="mt-3 bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded-md">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // Function to show custom modal
+        function showModal(message) {
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('myModal').style.display = 'flex';
+        }
+
+        // Function to close custom modal
+        function closeModal() {
+            document.getElementById('myModal').style.display = 'none';
+        }
+
+        // Function to open specific tab
+        function openTab(evt, tabName) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tab-content" and hide them
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+
+            // Get all elements with class="tab-button" and remove the "active" class
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active"); // Use classList for better management
+            }
+
+            // Show the current tab, and add an "active" class to the button that opened the tab
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.classList.add("active"); // Use classList for better management
+
+            // Hide answers section when switching tabs
+            document.getElementById('answers').classList.add('hidden');
+            document.getElementById('answerContent').innerHTML = ''; // Clear previous answers
+        }
+
+        // Function to navigate to the next tab
+        function continueToNextTab(currentTabName) {
+            if (currentTabName === 'bahagianA') {
+                document.getElementById('tabB_button').click(); // Click Bahagian B button
+            } else if (currentTabName === 'bahagianB') {
+                document.getElementById('tabC_button').click(); // Click Bahagian C button
+            }
+            // No action for Bahagian C, as it has the submit button
+        }
+
+        // Set default tab to Bahagian A on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('tabA_button').click();
+        });
+
+        // Correct answers for Bahagian A and B
+        const correctAnswers = {
+            // Bahagian A
+            q1: "C",
+            q2: "D",
+            q3: "B",
+            q4: "C",
+            q5: "D",
+
+            // Bahagian B
+            b1a_i: ["Funan", "Angkor"], // Allow either order
+            b1a_ii: ["Funan", "Angkor"],
+            b1b_i: ["Bergantung kepada aktiviti pertanian", "Terletak di kawasan subur", "Mempunyai sistem pengairan", "Lembah sungai"], // Multiple possible correct answers
+            b1b_ii: ["Bergantung kepada aktiviti pertanian", "Terletak di kawasan subur", "Mempunyai sistem pengairan", "Lembah sungai"],
+            b1c: "Meningkatkan hasil pertanian", // Main answer, others are derivatives
+            b2_patih_kerajaan: "Majapahit",
+            b2_angkor_tokoh: "Suryavarman II",
+            b2_parameswara_kerajaan: "Melaka",
+            b3: "Pusat pengumpulan dan pengedaran barang dagangan dari pelbagai tempat",
+            b4_i: ["Kedudukan strategik", "Kemudahan pelabuhan", "Bekalan barang dagangan", "Permintaan pasaran"],
+            b4_ii: ["Kedudukan strategik", "Kemudahan pelabuhan", "Bekalan barang dagangan", "Permintaan pasaran"]
+        };
+
+        function submitAnswers() {
+            const answerContentDiv = document.getElementById('answerContent');
+            answerContentDiv.innerHTML = ''; // Clear previous answers
+            document.getElementById('answers').classList.remove('hidden'); // Show answers section
+
+            // --- Bahagian A Evaluation ---
+            answerContentDiv.innerHTML += '<h3 class="font-semibold mb-2 text-gray-800">Bahagian A: Soalan Objektif</h3>';
+            for (let i = 1; i <= 5; i++) {
+                const qName = `q${i}`;
+                const selectedOption = document.querySelector(`input[name="${qName}"]:checked`);
+                const userAnswer = selectedOption ? selectedOption.value : "Tiada Jawapan";
+                const correctAnswer = correctAnswers[qName];
+                const isCorrect = userAnswer === correctAnswer;
+
+                let resultClass = isCorrect ? 'correct-answer' : 'incorrect-answer';
+                let resultText = isCorrect ? 'Betul' : 'Salah';
+
+                answerContentDiv.innerHTML += `
+                    <p><strong>Soalan ${i}:</strong> Jawapan anda: <span class="${resultClass}">${userAnswer}</span>. Jawapan sebenar: <span class="correct-answer">${correctAnswer}</span>.</p>
+                `;
+            }
+
+            // --- Bahagian B Evaluation ---
+            answerContentDiv.innerHTML += '<h3 class="font-semibold mt-4 mb-2 text-gray-800">Bahagian B: Soalan Struktur</h3>';
+
+            // B1(a)
+            const b1a_i_user = document.getElementById('b1a_i').value.trim();
+            const b1a_ii_user = document.getElementById('b1a_ii').value.trim();
+            const b1a_correct = correctAnswers.b1a_i; // Both i and ii share the same correct list
+            const isB1a_i_correct = b1a_correct.includes(b1a_i_user) && b1a_i_user !== b1a_ii_user;
+            const isB1a_ii_correct = b1a_correct.includes(b1a_ii_user) && b1a_i_user !== b1a_ii_user;
+
+            let b1a_i_class = isB1a_i_correct ? 'correct-answer' : 'incorrect-answer';
+            let b1a_ii_class = isB1a_ii_correct ? 'correct-answer' : 'incorrect-answer';
+
+            answerContentDiv.innerHTML += `
+                <p><strong>Soalan B1(a):</strong></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;i. Jawapan anda: <span class="${b1a_i_class}">${b1a_i_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b1a_correct[0]} atau ${b1a_correct[1]}</span>.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;ii. Jawapan anda: <span class="${b1a_ii_class}">${b1a_ii_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b1a_correct[0]} atau ${b1a_correct[1]}</span>.</p>
+            `;
+
+            // B1(b)
+            const b1b_i_user = document.getElementById('b1b_i').value.trim();
+            const b1b_ii_user = document.getElementById('b1b_ii').value.trim();
+            const b1b_correct = correctAnswers.b1b_i; // Both i and ii share the same correct list
+            const isB1b_i_correct = b1b_correct.some(ans => ans.toLowerCase() === b1b_i_user.toLowerCase());
+            const isB1b_ii_correct = b1b_correct.some(ans => ans.toLowerCase() === b1b_ii_user.toLowerCase()) && b1b_i_user.toLowerCase() !== b1b_ii_user.toLowerCase();
+
+            let b1b_i_class = isB1b_i_correct ? 'correct-answer' : 'incorrect-answer';
+            let b1b_ii_class = isB1b_ii_correct ? 'correct-answer' : 'incorrect-answer';
+
+            answerContentDiv.innerHTML += `
+                <p><strong>Soalan B1(b):</strong></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;i. Jawapan anda: <span class="${b1b_i_class}">${b1b_i_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b1b_correct.join(', ')}</span>.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;ii. Jawapan anda: <span class="${b1b_ii_class}">${b1b_ii_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b1b_correct.join(', ')}</span>.</p>
+            `;
+
+            // B1(c)
+            const b1c_user = document.getElementById('b1c').value.trim();
+            const b1c_correct = correctAnswers.b1c;
+            const isB1c_correct = b1c_user.toLowerCase() === b1c_correct.toLowerCase();
+            let b1c_class = isB1c_correct ? 'correct-answer' : 'incorrect-answer';
+            answerContentDiv.innerHTML += `
+                <p><strong>Soalan B1(c):</strong> Jawapan anda: <span class="${b1c_class}">${b1c_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b1c_correct}</span>.</p>
+            `;
+
+            // B2 (Table)
+            answerContentDiv.innerHTML += `<p class="mt-3"><strong>Soalan B2: Jadual Tokoh</strong></p>`;
+            const b2_patih_kerajaan_user = document.getElementById('b2_patih_kerajaan').value.trim();
+            const b2_angkor_tokoh_user = document.getElementById('b2_angkor_tokoh').value.trim();
+            const b2_parameswara_kerajaan_user = document.getElementById('b2_parameswara_kerajaan').value.trim();
+
+            const is_b2_patih_kerajaan_correct = b2_patih_kerajaan_user.toLowerCase() === correctAnswers.b2_patih_kerajaan.toLowerCase();
+            const is_b2_angkor_tokoh_correct = b2_angkor_tokoh_user.toLowerCase() === correctAnswers.b2_angkor_tokoh.toLowerCase();
+            const is_b2_parameswara_kerajaan_correct = b2_parameswara_kerajaan_user.toLowerCase() === correctAnswers.b2_parameswara_kerajaan.toLowerCase();
+
+            answerContentDiv.innerHTML += `
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;Patih Gajah Mada (Kerajaan): Jawapan anda: <span class="${is_b2_patih_kerajaan_correct ? 'correct-answer' : 'incorrect-answer'}">${b2_patih_kerajaan_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${correctAnswers.b2_patih_kerajaan}</span>.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;Angkor (Tokoh): Jawapan anda: <span class="${is_b2_angkor_tokoh_correct ? 'correct-answer' : 'incorrect-answer'}">${b2_angkor_tokoh_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${correctAnswers.b2_angkor_tokoh}</span>.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;Parameswara (Kerajaan): Jawapan anda: <span class="${is_b2_parameswara_kerajaan_correct ? 'correct-answer' : 'incorrect-answer'}">${b2_parameswara_kerajaan_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${correctAnswers.b2_parameswara_kerajaan}</span>.</p>
+            `;
+
+            // B3
+            const b3_user = document.getElementById('b3').value.trim();
+            const b3_correct = correctAnswers.b3;
+            const isB3_correct = b3_user.toLowerCase() === b3_correct.toLowerCase();
+            let b3_class = isB3_correct ? 'correct-answer' : 'incorrect-answer';
+            answerContentDiv.innerHTML += `
+                <p class="mt-3"><strong>Soalan B3:</strong> Jawapan anda: <span class="${b3_class}">${b3_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b3_correct}</span>.</p>
+            `;
+
+            // B4
+            const b4_i_user = document.getElementById('b4_i').value.trim();
+            const b4_ii_user = document.getElementById('b4_ii').value.trim();
+            const b4_correct = correctAnswers.b4_i; // Both i and ii share the same correct list
+            const isB4_i_correct = b4_correct.some(ans => ans.toLowerCase() === b4_i_user.toLowerCase());
+            const isB4_ii_correct = b4_correct.some(ans => ans.toLowerCase() === b4_ii_user.toLowerCase()) && b4_i_user.toLowerCase() !== b4_ii_user.toLowerCase();
+
+            let b4_i_class = isB4_i_correct ? 'correct-answer' : 'incorrect-answer';
+            let b4_ii_class = isB4_ii_correct ? 'correct-answer' : 'incorrect-answer';
+
+            answerContentDiv.innerHTML += `
+                <p><strong>Soalan B4:</strong></p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;i. Jawapan anda: <span class="${b4_i_class}">${b4_i_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b4_correct.join(', ')}</span>.</p>
+                <p>&nbsp;&nbsp;&nbsp;&nbsp;ii. Jawapan anda: <span class="${b4_ii_class}">${b4_ii_user || 'Tiada Jawapan'}</span>. Jawapan sebenar: <span class="correct-answer">${b4_correct.join(', ')}</span>.</p>
+            `;
+
+            // Scroll to answers section
+            document.getElementById('answers').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
